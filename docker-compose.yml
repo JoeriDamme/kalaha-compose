@@ -1,0 +1,36 @@
+version: '3'
+services:
+  kalaha-fe:
+    build: https://github.com/JoeriDamme/kalaha-fe.git
+    container_name: 'kalaha-fe'
+    ports:
+      - '8080:8080'
+  kalaha-be:
+    build: https://github.com/JoeriDamme/kalaha-be.git
+    container_name: 'kalaha-be'
+    environment:
+     - MONGO_HOST=database
+     - MONGO_USERNAME=admin
+     - MONGO_PASSWORD=admin
+     - MONGO_DBNAME=kalaha
+    ports:
+      - '8081:8081'
+    networks:
+      - my-network
+  database:
+    image: 'mongo'
+    container_name: 'mongo-db-kalaha'
+    environment: 
+      - MONGO_INITDB_DATABASE=kalaha
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongo-data:/data/db
+    ports: 
+      - '27017-27019:27017-27019'
+    networks:
+      - my-network
+networks:
+  my-network:
+    driver: bridge
